@@ -1,0 +1,29 @@
+{
+  "name": "udyam-digital",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+  "typecheck": "tsc --noEmit",
+  "test": "vitest run --passWithNoTests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rohithjagan05/udyam-digital.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rohithjagan05/udyam-digital/issues"
+  },
+  "homepage": "https://github.com/rohithjagan05/udyam-digital#readme",
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}
