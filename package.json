@@ -8,8 +8,8 @@
     "test": "tests"
   },
   "scripts": {
-  "typecheck": "tsc --noEmit",
-  "test": "vitest run --passWithNoTests"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
   },
   "repository": {
     "type": "git",
@@ -23,7 +23,11 @@
   },
   "homepage": "https://github.com/rohithjagan05/udyam-digital#readme",
   "devDependencies": {
+    "@types/node": "^26.6.6",
     "typescript": "^7.0.2",
     "vitest": "^5.1.0"
+  },
+  "dependencies": {
+    "csv-parse": "^7.0.3"
   }
 }
