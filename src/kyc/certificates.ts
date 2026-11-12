@@ -1,5 +1,6 @@
 import type { GstinRecord } from "../registry/gstin";
 import type { UdyamRecord } from "../registry/udyam";
+import { correctGstinOcr } from "./ocr";
 
 export interface FieldMismatch {
   field: string;
@@ -49,9 +50,10 @@ function compare(
 
 // Checks a GST certificate's OCR text against the GSTIN registry record.
 export function crossCheckGst(ocrText: string, record: GstinRecord): CrossCheck {
+  const rawGstin = readField(ocrText, /GSTIN\s*[:\-]?\s*([0-9A-Z]{15})/i);
   return compare(
     {
-      gstin: readField(ocrText, /GSTIN\s*[:\-]?\s*([0-9A-Z]{15})/i),
+      gstin: rawGstin === null ? null : correctGstinOcr(rawGstin),
       legal_name: readField(ocrText, /^\s*Legal name\s*[:\-]?\s*(.+)$/im),
       trade_name: readField(ocrText, /^\s*Trade name\s*[:\-]?\s*(.+)$/im),
     },
