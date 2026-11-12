@@ -1,6 +1,6 @@
 import type { GstinRecord } from "../registry/gstin";
 import type { UdyamRecord } from "../registry/udyam";
-import { correctGstinOcr } from "./ocr";
+import { correctGstinOcr, correctUdyamOcr } from "./ocr";
 
 export interface FieldMismatch {
   field: string;
@@ -69,7 +69,10 @@ export function crossCheckGst(ocrText: string, record: GstinRecord): CrossCheck 
 export function crossCheckUdyam(ocrText: string, record: UdyamRecord): CrossCheck {
   return compare(
     {
-      udyam_number: readField(ocrText, /(UDYAM-[A-Z]{2}-\d{2}-\d{7})/i),
+      udyam_number: (() => {
+        const raw = readField(ocrText, /(UDYAM-\s*[A-Z]{2}\s*-\s*[0-9O]{2}\s*-\s*[0-9O]{7})/i);
+        return raw === null ? null : correctUdyamOcr(raw);
+      })(),
       enterprise_name: readField(ocrText, /^\s*Enterprise name\s*[:\-]?\s*(.+)$/im),
       city: readField(ocrText, /^\s*City\s*[:\-]?\s*(.+)$/im),
       state: readField(ocrText, /^\s*State\s*[:\-]?\s*(.+)$/im),

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
-import { correctGstinOcr, runOcr } from "../src/kyc/ocr";
+import { correctGstinOcr, correctUdyamOcr, runOcr } from "../src/kyc/ocr";
 import { checkGstin } from "../src/validators/gstin";
 import { MockGstinRegistry } from "../src/registry/gstin";
 import { MockUdyamRegistry } from "../src/registry/udyam";
@@ -23,6 +23,16 @@ describe("GSTIN OCR correction", () => {
   });
 });
 
+describe("Udyam OCR correction", () => {
+  it("removes a space OCR inserted inside the number", () => {
+    expect(correctUdyamOcr("UDYAM-MH- 00-6131836")).toBe("UDYAM-MH-00-6131836");
+  });
+
+  it("turns a letter O in the digit groups into zero", () => {
+    expect(correctUdyamOcr("UDYAM-MH-OO-6131836")).toBe("UDYAM-MH-00-6131836");
+  });
+});
+
 describe.skipIf(!hasTesseract)("OCR on the specimen certificates", () => {
   const docs = resolve(process.cwd(), "data/kyc_documents");
   const gstinRegistry = new MockGstinRegistry(resolve(process.cwd(), "data/mock_gstin_registry.csv"));
@@ -40,5 +50,15 @@ describe.skipIf(!hasTesseract)("OCR on the specimen certificates", () => {
     const result = crossCheckUdyam(text, record);
     expect(result.missing).toEqual([]);
     expect(result.mismatches.map((m) => m.field)).toEqual(["date_of_registration"]);
+  });
+
+  it("reads the K04 Udyam certificate, fixes the space, and flags the registration date", async () => {
+    const text = await runOcr(resolve(docs, "K04_udyam_certificate.png"));
+    const record = (await udyamRegistry.lookup("UDYAM-MH-00-6131836"))!;
+    expect(crossCheckUdyam(text, record)).toEqual({
+      ok: false,
+      missing: [],
+      mismatches: [{ field: "date_of_registration", certificate: "2025-05-17", registry: "2020-10-24" }],
+    });
   });
 });

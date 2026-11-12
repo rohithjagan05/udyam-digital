@@ -32,3 +32,13 @@ export function correctGstinOcr(raw: string): string {
     })
     .join("");
 }
+
+// OCR can add spaces inside a Udyam number and read 0 as O in the digit groups.
+// A Udyam number has the form UDYAM-XX-NN-NNNNNNN, so only the last two groups are digits.
+export function correctUdyamOcr(raw: string): string {
+  const compact = raw.replace(/\s+/g, "").toUpperCase();
+  const [prefix, state, district, serial] = compact.split("-");
+  const fixDigits = (group: string | undefined) =>
+    (group ?? "").split("").map((c) => DIGIT_FIX[c] ?? c).join("");
+  return [prefix, state, fixDigits(district), fixDigits(serial)].join("-");
+}
